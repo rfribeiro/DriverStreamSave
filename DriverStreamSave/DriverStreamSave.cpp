@@ -2,7 +2,7 @@
 //
 
 #include <iostream>
-
+#include <direct.h>
 #include <librealsense/rs.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
@@ -45,12 +45,44 @@ bool initialize_streaming()
 	{
 		_rs_camera = _rs_ctx.get_device(0);
 
+		// set before stream
+		//_rs_camera->set_option(rs::option::r200_depth_clamp_max, 1.0f); //Minimum depth in current depth units that will be output. Any values less than "Max Depth" will be mapped to 0 during the conversion between disparity and depth. Set before streaming. 
+		//_rs_camera->set_option(rs::option::r200_disparity_multiplier, 1.0f); //Disparity scale factor used when in disparity output mode. Can only be set before streaming.
+		//_rs_camera->set_option(rs::option::r200_depth_units, 1.0f); //Micrometers per increment in integer depth values. 1000 is default (mm scale). Set before streaming.
+		//_rs_camera->set_option(rs::option::r200_depth_clamp_min, 1.0f); //Minimum depth in current depth units that will be output. Any values less than "Min Depth" will be mapped to 0 during the conversion between disparity and depth. Set before streaming.
+
 		_rs_camera->enable_stream(rs::stream::color, INPUT_WIDTH, INPUT_HEIGHT, rs::format::rgb8, FRAMERATE);
 		_rs_camera->enable_stream(rs::stream::depth, INPUT_WIDTH, INPUT_HEIGHT, rs::format::z16, FRAMERATE);
 		_rs_camera->enable_stream(rs::stream::infrared, INPUT_WIDTH, INPUT_HEIGHT, rs::format::y8, FRAMERATE);
 		_rs_camera->enable_stream(rs::stream::infrared2, INPUT_WIDTH, INPUT_HEIGHT, rs::format::y8, FRAMERATE);
 
 		_rs_camera->start();
+
+		_rs_camera->set_option(rs::option::r200_emitter_enabled, 1.0f); //Enables/disables R200 emitter 
+		_rs_camera->set_option(rs::option::r200_lr_auto_exposure_enabled, 1.0f); //Enable/disable R200 auto-exposure. This will affect both IR and depth images. 
+
+		//_rs_camera->set_option(rs::option::r200_lr_gain, 1.0f); //IR image gain 
+		//_rs_camera->set_option(rs::option::r200_lr_exposure, 1.0f); //This control allows manual adjustment of the exposure time value for the L/R imagers. 
+		//_rs_camera->set_option(rs::option::r200_disparity_shift, 1.0f); //{0 - 512}. Can only be set before streaming starts.
+		//_rs_camera->set_option(rs::option::r200_auto_exposure_mean_intensity_set_point, 1.0f); //Mean intensity set point. Requires the r200_lr_auto_exposure_enabled option to be set to 1
+		//_rs_camera->set_option(rs::option::r200_auto_exposure_bright_ratio_set_point, 1.0f); //Bright ratio set point. Requires the r200_lr_auto_exposure_enabled option to be set to 1.
+		//_rs_camera->set_option(rs::option::r200_auto_exposure_kp_gain, 1.0f); //Kp gain. Requires the r200_lr_auto_exposure_enabled option to be set to 1
+		//_rs_camera->set_option(rs::option::r200_auto_exposure_kp_exposure, 1.0f); //Kp exposure. Requires the r200_lr_auto_exposure_enabled option to be set to 1
+		//_rs_camera->set_option(rs::option::r200_auto_exposure_kp_dark_threshold, 1.0f); //Kp dark threshold. Requires the r200_lr_auto_exposure_enabled option to be set to 1. 
+		//_rs_camera->set_option(rs::option::r200_auto_exposure_top_edge, 1.0f); //Auto-exposure region-of-interest top edge (in pixels). Requires the r200_lr_auto_exposure_enabled option to be set to 1
+		//_rs_camera->set_option(rs::option::r200_auto_exposure_bottom_edge, 1.0f); //Auto-exposure region-of-interest bottom edge (in pixels). Requires the r200_lr_auto_exposure_enabled option to be set to 1
+		//_rs_camera->set_option(rs::option::r200_auto_exposure_left_edge, 1.0f); //Auto-exposure region-of-interest left edge (in pixels). Requires the r200_lr_auto_exposure_enabled option to be set to 1.
+		//_rs_camera->set_option(rs::option::r200_auto_exposure_right_edge, 1.0f); //Auto-exposure region-of-interest right edge (in pixels). Requires the r200_lr_auto_exposure_enabled option to be set to 1.
+		//_rs_camera->set_option(rs::option::r200_depth_control_estimate_median_decrement, 1.0f); //Value to subtract when estimating the median of the correlation surface
+		//_rs_camera->set_option(rs::option::r200_depth_control_estimate_median_increment, 1.0f); //Value to add when estimating the median of the correlation surface
+		//_rs_camera->set_option(rs::option::r200_depth_control_median_threshold, 1.0f);	//Threshold: by how much the winning score exceeds the median
+		//_rs_camera->set_option(rs::option::r200_depth_control_score_minimum_threshold, 1.0f); //Minimum correlation score that is considered acceptable
+		//_rs_camera->set_option(rs::option::r200_depth_control_score_maximum_threshold, 1.0f); // Maximum correlation score that is considered acceptable 
+		//_rs_camera->set_option(rs::option::r200_depth_control_texture_count_threshold, 1.0f); //Parameter for determining whether the texture in the region is sufficient to justify a depth result 
+		//_rs_camera->set_option(rs::option::r200_depth_control_texture_difference_threshold, 1.0f); // Parameter for determining whether the texture in the region is sufficient to justify a depth result
+		//_rs_camera->set_option(rs::option::r200_depth_control_second_peak_threshold, 1.0f); //Threshold: how much the minimum correlation score must differ from the next best score.
+		//_rs_camera->set_option(rs::option::r200_depth_control_neighbor_threshold, 1.0f); //Neighbor threshold value for depth calculation 
+		//_rs_camera->set_option(rs::option::r200_depth_control_lr_threshold, 1.0f);	//Left-right threshold value for depth calculation 
 
 		success = true;
 	}
@@ -64,13 +96,17 @@ bool initialize_streaming()
 /////////////////////////////////////////////////////////////////////////////
 static void onMouse(int event, int x, int y, int, void* window_name)
 {
-	if (event == cv::EVENT_LBUTTONDOWN)
+	if (event == cv::EVENT_RBUTTONDOWN)
 	{
 		_loop = false;
 	}
-	else if (event == cv::EVENT_RBUTTONDOWN) 
+	else if (event == cv::EVENT_LBUTTONDOWN) 
 	{
 		_saving = true;
+	}
+	else if (event == cv::EVENT_MBUTTONDOWN)
+	{
+		_rs_camera->set_option(rs::option::r200_lr_auto_exposure_enabled, 1.0f);
 	}
 }
 
@@ -138,9 +174,9 @@ bool display_next_frame()
 	imshow(WINDOW_IR, ir);
 	cvWaitKey(1);
 
-	//cv::cvtColor(rgb, rgb, cv::COLOR_BGR2RGB);
-	//imshow(WINDOW_RGB, rgb);
-	//cvWaitKey(1);
+	cv::cvtColor(rgb, rgb, cv::COLOR_BGR2RGB);
+	imshow(WINDOW_RGB, rgb);
+	cvWaitKey(1);
 
 	if (_saving)
 	{
@@ -171,6 +207,8 @@ void save_frames_to_disk(string user, int point)
 	auto start = std::chrono::steady_clock::now();
 	cout << "Saving frames to disk! ";
 	string filename = user;
+	//filename += "\\";
+	//filename += user;
 	filename += "_";
 	filename += std::to_string(point);
 	filename += "_";
@@ -244,11 +282,18 @@ int main() try
 
 		if (!user.empty())
 		{
+			//mkdir(user.c_str());
+
 			while (_loop) 
 			{
 				int point = 0;
 				cout << "Point to save: ";
 				cin >> point;
+
+				if (point == 0)
+				{
+					break;
+				}
 
 				init_variables();
 
