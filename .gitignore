@@ -3,6 +3,9 @@
 *.DS_Store
 
 #Visual Studio files
+*.db
+DriverStreamSave.VC.VC.opendb
+DriverStreamSave.VC.db
 *.jpg
 *.jpeg
 *.png
