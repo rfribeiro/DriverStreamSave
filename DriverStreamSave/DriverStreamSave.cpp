@@ -229,7 +229,7 @@ void save_frames_to_disk(string user, int point)
 		savename += std::to_string(i);
 		savename += ".yaml";
 		cv::FileStorage file(savename, cv::FileStorage::WRITE);
-		file << filename << matDepth[i];
+		file << "depth" << matDepth[i];
 
 		savename = filename;
 		savename += "depth";
