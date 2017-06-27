@@ -220,7 +220,7 @@ void save_frames_to_disk(string user, int point)
 		savename += "rgb";
 		savename += "_";
 		savename += std::to_string(i);
-		savename += ".jpeg";
+		savename += ".bmp";
 		imwrite(savename, matColor[i]);
 
 		savename = filename;
@@ -235,21 +235,21 @@ void save_frames_to_disk(string user, int point)
 		savename += "depth";
 		savename += "_";
 		savename += std::to_string(i);
-		savename += ".jpeg";
+		savename += ".bmp";
 		imwrite(savename, matDepth[i]);
 
 		savename = filename;
 		savename += "ir1";
 		savename += "_";
 		savename += std::to_string(i);
-		savename += ".jpeg";
+		savename += ".bmp";
 		imwrite(savename, matIR1[i]);
 
 		savename = filename;
 		savename += "ir2";
 		savename += "_";
 		savename += std::to_string(i);
-		savename += ".jpeg";
+		savename += ".bmp";
 		imwrite(savename, matIR2[i]);
 	}
 	auto finish = std::chrono::steady_clock::now();
