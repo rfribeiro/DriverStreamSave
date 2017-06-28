@@ -6,6 +6,7 @@
 #include <librealsense/rs.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
+#include <Windows.h>
 
 using namespace std;
 using namespace rs;
@@ -102,6 +103,7 @@ static void onMouse(int event, int x, int y, int, void* window_name)
 	}
 	else if (event == cv::EVENT_LBUTTONDOWN) 
 	{
+		Beep(1000, 300);
 		_saving = true;
 	}
 	else if (event == cv::EVENT_MBUTTONDOWN)
@@ -306,6 +308,7 @@ int main() try
 					display_next_frame();
 				}
 
+				Beep(1000, 300);
 				save_frames_to_disk(user, point);
 			}
 		}
